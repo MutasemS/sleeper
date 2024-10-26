@@ -21,18 +21,3 @@ A budget tracking application that helps users create custom budget categories, 
 
 4. **Spending Visualization**
    - Visualize spending per category over a range of time periods (monthly, quarterly, etc.).
-
-## Technologies Used
-
-- **Backend**: Node.js / Express
-- **Database**: PostgreSQL
-- **Authentication & Authorization**: Implemented for secure access to user data
-- **LLM Chatbot (Optional)**: Integrated for conversational interactions
-
-## Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository_url>
-   cd budget-tracker
-   ```
