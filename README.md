@@ -1,29 +1,23 @@
-# Create T3 App
+# Budget Tracker
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A budget tracking application that helps users create custom budget categories, set monthly spending targets, track transactions, and visualize spending trends over time.
 
-## What's next? How do I make an app with this?
+## Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+1. **Budget Categories & Targets**
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+   - Create custom budget categories.
+   - Set monthly spending targets per category.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+2. **Transaction Management**
 
-## Learn More
+   - Submit individual transactions.
+   - Upload a CSV file containing transactions.
+   - Categorize transactions under user-defined categories.
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+3. **Notifications**
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+   - Receive notifications if spending exceeds set budget targets for any category.
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+4. **Spending Visualization**
+   - Visualize spending per category over a range of time periods (monthly, quarterly, etc.).
