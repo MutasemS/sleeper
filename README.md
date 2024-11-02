@@ -23,9 +23,9 @@ A budget tracking application that helps users create custom budget categories, 
    - Visualize spending per category over a range of time periods (monthly, quarterly, etc.).
 
 
-5. **How to run website**
-   - For local running
-        - run "nmp I"
-        -  then "npm run dev"
-        -  visit local host to view
-  -  Visit "sleeper-nine.vercel.app" to view deployed website
+5. **How to run the website**
+   - For local running:
+     - Run `npm install`
+     - Then `npm run dev`
+     - Visit `localhost` to view
+   - Visit [sleeper-nine.vercel.app](https://sleeper-nine.vercel.app) to view the deployed website.
