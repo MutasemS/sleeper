@@ -3,6 +3,14 @@
 import { api } from "~/trpc/react";
 import { useState } from "react";
 
+interface Transaction {
+  id: string;
+  category: string;
+  amount: number;
+  transactionDate: string;
+  description?: string;
+}
+
 export function Transactions() {
   const { data: latestTransactions, isLoading } =
     api.transaction.getAll.useQuery();
@@ -19,7 +27,7 @@ export function Transactions() {
     <div>
       <h2>Latest Transactions</h2>
       <ul>
-        {latestTransactions.map((transaction) => (
+        {latestTransactions.map((transaction: Transaction) => (
           <li key={transaction.id}>
             <p>Category: {transaction.category}</p>
             <p>Amount: {transaction.amount}</p>
@@ -40,7 +48,11 @@ export function TransactionForm() {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
 
-  const createTransaction = api.transaction.create.useMutation({
+  const createTransaction = api.transaction.create.useMutation<{
+    category: string;
+    amount: number;
+    description?: string;
+  }>({
     onSuccess: () => {
       setCategory("");
       setAmount("");
