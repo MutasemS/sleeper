@@ -2,7 +2,7 @@
 
 import { api } from "~/trpc/react";
 import { useState } from "react";
-import { Transaction } from "~/types/transactionType";
+import type { Transaction } from "~/types/transactionType";
 
 export function Transactions() {
   const { data: latestTransactions, isLoading } =

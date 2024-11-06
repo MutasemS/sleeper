@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { supabase } from "~/server/supabaseClient";
-import { Transaction } from "~/types/transactionType";
+import type { Transaction } from "~/types/transactionType";
+import type { PostgrestError } from "@supabase/supabase-js";
 
 export const transactionRouter = createTRPCRouter({
   create: publicProcedure
@@ -23,7 +24,10 @@ export const transactionRouter = createTRPCRouter({
             description: input.description ?? null,
           },
         ])
-        .select("*")) as { data: Transaction[] | null; error: any };
+        .select("*")) as {
+        data: Transaction[] | null;
+        error: PostgrestError | null;
+      };
 
       if (error) {
         throw new Error(`Error inserting transaction: ${error.message}`);
@@ -35,7 +39,10 @@ export const transactionRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
     const { data, error } = (await supabase
       .from("transactions")
-      .select("*")) as { data: Transaction[] | null; error: any };
+      .select("*")) as {
+      data: Transaction[] | null;
+      error: PostgrestError | null;
+    };
 
     if (error) {
       throw new Error(`Error fetching transactions: ${error.message}`);
