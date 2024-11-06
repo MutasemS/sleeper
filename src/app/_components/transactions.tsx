@@ -2,14 +2,7 @@
 
 import { api } from "~/trpc/react";
 import { useState } from "react";
-
-interface Transaction {
-  id: string;
-  category: string;
-  amount: number;
-  transactionDate: string;
-  description?: string;
-}
+import { Transaction } from "~/types/transactionType";
 
 export function Transactions() {
   const { data: latestTransactions, isLoading } =
@@ -34,7 +27,7 @@ export function Transactions() {
             <p>Date: {transaction.transactionDate}</p>
             <p>
               Description:{" "}
-              {transaction.description || "No description provided"}
+              {transaction.description ?? "No description provided"}
             </p>
           </li>
         ))}
