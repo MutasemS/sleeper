@@ -1,4 +1,6 @@
+import exp from "constants";
 import { postRouter } from "~/server/api/routers/post";
+import { transactionRouter } from "~/server/api/routers/transactions";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -8,8 +10,8 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   post: postRouter,
+  transaction: transactionRouter,
 });
-
 // export type definition of API
 export type AppRouter = typeof appRouter;
 
