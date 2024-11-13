@@ -17,24 +17,24 @@ export function Transactions() {
   const { data: latestTransactions, isLoading } =
     api.transaction.getAll.useQuery();
 
+    const transactionsByCategory = useMemo(() => {
+      if (!latestTransactions) return {}; // Empty object if no data
+    
+      return latestTransactions.reduce((acc, transaction) => {
+        // Use nullish coalescing to ensure the array is initialized
+        (acc[transaction.category] ??= []).push(transaction);
+    
+        return acc;
+      }, {} as Record<string, Transaction[]>);
+    }, [latestTransactions]);    
+
   if (isLoading) {
     return <p>Loading...</p>;
   }
 
-  if (!latestTransactions) {
+  if (!latestTransactions || Object.keys(transactionsByCategory).length === 0) {
     return <p>No transactions available.</p>;
   }
-
-  const transactionsByCategory = useMemo(() => {
-    return latestTransactions.reduce((acc, transaction) => {
-      if (!acc[transaction.category]) {
-        acc[transaction.category] = [];
-      }
-      // Use a non-null assertion to let TypeScript know it's defined
-      acc[transaction.category]!.push(transaction);
-      return acc;
-    }, {} as Record<string, Transaction[]>);
-  }, [latestTransactions]);
 
   return (
     <div>
