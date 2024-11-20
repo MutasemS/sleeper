@@ -16,7 +16,6 @@ import type { Transaction } from "~/types/transactionType";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-// Define the type for chart data
 interface ChartData {
   labels: string[];
   datasets: {
@@ -29,7 +28,6 @@ interface ChartData {
 }
 
 const BarGraph = () => {
-  // Explicitly type the state
   const [chartData, setChartData] = useState<ChartData>({
     labels: [],
     datasets: [
@@ -51,7 +49,7 @@ const BarGraph = () => {
       transactions.forEach((transaction: Transaction) => {
         const category = typeof transaction.category === "string" ? transaction.category : "Uncategorized";
         if (category) {
-          categoryTotals[category] = (categoryTotals[category] || 0) + transaction.amount;
+          categoryTotals[category] = (categoryTotals[category] ?? 0) + transaction.amount;
         }
       });
 
