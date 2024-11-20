@@ -152,32 +152,35 @@ export function TransactionForm() {
 
 
 export function CategoryForm() {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [categoryname, setName] = useState("");
+  const [maxspendlimit, setMaxspendlimit] = useState("");
 
-  const createCategory = api.category.create.useMutation({
+  const createCategory = api.category.create.useMutation<{
+    categoryname: string;
+    maxspendlimit: number;
+  }>({
     onSuccess: () => {
-      // Reset the form fields on success
       setName("");
-      setDescription("");
+      setMaxspendlimit("");
     },
     onError: (error) => {
-      console.error("Error creating category:", error);
+      console.error("Error creating transaction:", error);
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim()) {
-      alert("Please provide a valid category name.");
+    const parsedLimit = parseFloat(maxspendlimit);
+    if (isNaN(parsedLimit)) {
+      alert("Please enter a valid amount.");
       return;
     }
-
+    
     try {
       await createCategory.mutateAsync({
-        name,
-        description: description || null, // Optional field
+        categoryname,
+        maxspendlimit: parsedLimit,
       });
     } catch (error) {
       console.error("Failed to add category", error);
@@ -190,16 +193,17 @@ export function CategoryForm() {
         <input
           type="text"
           placeholder="Category Name"
-          value={name}
+          value={categoryname}
           onChange={(e) => setName(e.target.value)}
           className="border p-2"
           required
         />
         <textarea
-          placeholder="Description (optional)"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Max Spend Limit"
+          value={maxspendlimit}
+          onChange={(e) => setMaxspendlimit(e.target.value)}
           className="border p-2"
+          required
         />
         <button
           type="submit"
