@@ -10,10 +10,10 @@ export const categoryRouter = createTRPCRouter({
       z.object({
         categoryname: z.string().min(1, "Category name is required"),
         maxspendlimit: z.number().positive().optional(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
-      const { data, error } = await (supabase
+      const { data, error } = (await supabase
         .from("categories")
         .insert([
           {
@@ -22,9 +22,9 @@ export const categoryRouter = createTRPCRouter({
           },
         ])
         .select("*")) as {
-          data: Category[] | null;
-          error: PostgrestError | null;
-        };
+        data: Category[] | null;
+        error: PostgrestError | null;
+      };
 
       if (error) {
         throw new Error(`Error inserting category: ${error.message}`);
@@ -33,26 +33,41 @@ export const categoryRouter = createTRPCRouter({
       return data;
     }),
 
-  getAll: publicProcedure.query(async () => {
-    const { data, error } = await (supabase
-      .from("categories")
-      .select("*")) as {
+  getAll: publicProcedure
+    .input(
+      z
+        .object({
+          minSpendLimit: z.number().positive().optional(),
+          maxSpendLimit: z.number().positive().optional(),
+        })
+        .optional(),
+    )
+    .query(async ({ input }) => {
+      let query = supabase.from("categories").select("*");
+
+      if (input?.minSpendLimit) {
+        query = query.gte("maxspendlimit", input.minSpendLimit);
+      }
+      if (input?.maxSpendLimit) {
+        query = query.lte("maxspendlimit", input.maxSpendLimit);
+      }
+
+      const { data, error } = (await query) as {
         data: Category[] | null;
         error: PostgrestError | null;
       };
 
-    if (error) {
-      throw new Error(`Error fetching categories: ${error.message}`);
-    }
+      if (error) {
+        throw new Error(`Error fetching categories: ${error.message}`);
+      }
 
-    return data;
-  }),
-
+      return data;
+    }),
   delete: publicProcedure
     .input(
       z.object({
         categoryid: z.number().positive(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const { data, error } = await supabase
@@ -73,10 +88,14 @@ export const categoryRouter = createTRPCRouter({
         categoryid: z.number().positive(),
         categoryname: z.string().optional(),
         maxspendlimit: z.number().positive().optional(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const { categoryid, ...updates } = input;
+
+      if (Object.keys(updates).length === 0) {
+        throw new Error("At least one field must be updated.");
+      }
 
       const { data, error } = await supabase
         .from("categories")
