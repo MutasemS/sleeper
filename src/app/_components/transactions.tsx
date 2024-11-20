@@ -149,3 +149,65 @@ export function TransactionForm() {
     </form>
   );
 }
+
+
+export function CategoryForm() {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+
+  const createCategory = api.category.create.useMutation({
+    onSuccess: () => {
+      // Reset the form fields on success
+      setName("");
+      setDescription("");
+    },
+    onError: (error) => {
+      console.error("Error creating category:", error);
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!name.trim()) {
+      alert("Please provide a valid category name.");
+      return;
+    }
+
+    try {
+      await createCategory.mutateAsync({
+        name,
+        description: description || null, // Optional field
+      });
+    } catch (error) {
+      console.error("Failed to add category", error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="mb-4">
+      <div className="flex flex-col gap-2">
+        <input
+          type="text"
+          placeholder="Category Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="border p-2"
+          required
+        />
+        <textarea
+          placeholder="Description (optional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="border p-2"
+        />
+        <button
+          type="submit"
+          className="mt-2 rounded bg-green-500 p-2 text-white"
+        >
+          Add Category
+        </button>
+      </div>
+    </form>
+  );
+}
