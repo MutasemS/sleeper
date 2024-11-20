@@ -1,4 +1,4 @@
-import { Transactions, TransactionForm, CategoryForm } from "~/app/_components/transactions";
+import { TransactionForm, CategoryForm } from "~/app/_components/transactions";
 
 export default function TransactionsPage() {
   return (

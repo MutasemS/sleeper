@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { supabase } from "~/server/supabaseClient";
+import { Category } from "~/types/categoryType";
+import type { PostgrestError } from "@supabase/supabase-js";
 
 export const categoryRouter = createTRPCRouter({
   create: publicProcedure
@@ -11,7 +13,7 @@ export const categoryRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from("categories")
         .insert([
           {
@@ -19,7 +21,10 @@ export const categoryRouter = createTRPCRouter({
             maxspendlimit: input.maxspendlimit ?? null,
           },
         ])
-        .select("*");
+        .select("*")) as {
+          data: Category[] | null;
+          error: PostgrestError | null;
+        };
 
       if (error) {
         throw new Error(`Error inserting category: ${error.message}`);
@@ -29,9 +34,12 @@ export const categoryRouter = createTRPCRouter({
     }),
 
   getAll: publicProcedure.query(async () => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from("categories")
-      .select("*");
+      .select("*")) as {
+        data: Category[] | null;
+        error: PostgrestError | null;
+      };
 
     if (error) {
       throw new Error(`Error fetching categories: ${error.message}`);
