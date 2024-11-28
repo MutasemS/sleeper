@@ -56,7 +56,7 @@ export const categoryRouter = createTRPCRouter({
         throw new Error("Category not found");
       }
 
-      return data.name;
+      return data.name as string;
     }),
   getAll: publicProcedure
     .input(

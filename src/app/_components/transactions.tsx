@@ -3,9 +3,6 @@
 import { api } from "~/trpc/react";
 import { useState } from "react";
 import { Loading } from "./loading";
-import { useUser } from "@clerk/nextjs";
-import { fail } from "assert";
-import { set } from "zod";
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
