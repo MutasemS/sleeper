@@ -175,6 +175,7 @@ export function CSVUploadForm() {
   const [errors, setErrors] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("");
 
   const { data: categories, isLoading: isCategoriesLoading } =
     api.category.getAll.useQuery();
@@ -194,6 +195,7 @@ export function CSVUploadForm() {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      setFileName(selectedFile.name);
     }
   };
 
@@ -280,7 +282,7 @@ export function CSVUploadForm() {
           htmlFor="file-upload"
           className="flex cursor-pointer items-center justify-center rounded-full bg-white/10 p-4 text-white transition-colors hover:bg-white/20 focus:ring-2 focus:ring-[hsl(280,100%,70%)]"
         >
-          Choose File
+          {fileName ? fileName : "Choose File"}
         </label>
 
         <button
