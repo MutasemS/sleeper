@@ -33,6 +33,31 @@ export const categoryRouter = createTRPCRouter({
       return data;
     }),
 
+  getCategoryNameById: publicProcedure
+    .input(
+      z.object({
+        categoryid: z.string().min(1, "Category ID is required"),
+      }),
+    )
+    .query(async ({ input }) => {
+      const { categoryid } = input;
+
+      const { data, error } = await supabase
+        .from("categories")
+        .select("name")
+        .eq("id", categoryid)
+        .single();
+
+      if (error) {
+        throw new Error(`Error fetching category: ${error.message}`);
+      }
+
+      if (!data) {
+        throw new Error("Category not found");
+      }
+
+      return data.name as string;
+    }),
   getAll: publicProcedure
     .input(
       z
