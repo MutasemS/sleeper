@@ -88,7 +88,7 @@ export function TransactionForm() {
         />
         <button
           type="submit"
-          className="rounded-full bg-[hsl(280,100%,70%)] p-4 text-white hover:bg-[hsl(280,100%,60%)]"
+          className="rounded-full bg-blue-500 p-4 text-white hover:bg-blue-600"
         >
           Add Transaction
         </button>
