@@ -14,7 +14,14 @@ import {
 import { api } from "~/trpc/react"; // Import your API client
 import type { Transaction } from "~/types/transactionType";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+);
 
 interface ChartData {
   labels: string[];
@@ -41,15 +48,23 @@ const BarGraph = () => {
     ],
   });
 
-  const { data: transactions, isLoading, error } = api.transaction.getAll.useQuery();
+  const {
+    data: transactions,
+    isLoading,
+    error,
+  } = api.transaction.getAll.useQuery();
 
   useEffect(() => {
     if (transactions && !isLoading && !error) {
       const categoryTotals: Record<string, number> = {};
       transactions.forEach((transaction: Transaction) => {
-        const category = typeof transaction.category === "string" ? transaction.category : "Uncategorized";
+        const category =
+          typeof transaction.category === "string"
+            ? transaction.category
+            : "Uncategorized";
         if (category) {
-          categoryTotals[category] = (categoryTotals[category] ?? 0) + transaction.amount;
+          categoryTotals[category] =
+            (categoryTotals[category] ?? 0) + transaction.amount;
         }
       });
 
