@@ -3,6 +3,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { supabase } from "~/server/supabaseClient";
 import type { Transaction } from "~/types/transactionType";
 import type { PostgrestError } from "@supabase/supabase-js";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export const transactionTableRouter = createTRPCRouter({
   create: publicProcedure
@@ -10,6 +11,7 @@ export const transactionTableRouter = createTRPCRouter({
       z.object({
         categoryid: z.string().min(1),
         amountspent: z.number().positive(),
+        userid: z.string().nonempty(),
         transactiondate: z
           .string()
           .optional()
@@ -20,7 +22,7 @@ export const transactionTableRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      const { categoryid, amountspent, transactiondate } = input;
+      const { categoryid, amountspent, transactiondate, userid } = input;
 
       const { data, error } = (await supabase
         .from("transactionstable")
@@ -29,6 +31,7 @@ export const transactionTableRouter = createTRPCRouter({
             categoryid: input.categoryid,
             amountspent: input.amountspent,
             transactiondate: input.transactiondate,
+            userid: input.userid,
           },
         ])
         .select("*")) as {
@@ -43,20 +46,38 @@ export const transactionTableRouter = createTRPCRouter({
       return data;
     }),
 
-  getAll: publicProcedure.query(async () => {
-    const { data, error } = (await supabase
-      .from("transactionstable")
-      .select("*")) as {
-      data: Transaction[] | null;
-      error: PostgrestError | null;
-    };
+  getAll: publicProcedure
+    .input(z.object({ userId: z.string().min(1, "User ID must be provided.") }))
+    .query(async ({ input }) => {
+      const { userId } = input;
+      console.log(`getAll called for userId: ${userId}`); // Debugging log
+      const { data, error } = (await supabase
+        .from("transactionstable")
+        .select(
+          `
+          transactionid,
+          categoryid,
+          amountspent,
+          transactiondate,
+          userid,
+          categories (categoryid, categoryname)
+        `,
+        )
+        .eq("userid", userId)) as {
+        data:
+          | (Transaction & {
+              categories: { categoryid: string; categoryname: string };
+            })[]
+          | null;
+        error: PostgrestError | null;
+      };
 
-    if (error) {
-      throw new Error(`Error fetching transactions: ${error.message}`);
-    }
-
-    return data;
-  }),
+      if (error) {
+        throw new Error(`Error fetching transactions: ${error.message}`);
+      }
+      console.log(`getAll returning data: ${JSON.stringify(data)}`); // Debugging log
+      return data;
+    }),
 
   getByCategory: publicProcedure
     .input(

@@ -11,8 +11,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { api } from "~/trpc/react"; // Import your API client
+import { api } from "~/trpc/react";
 import type { Transaction } from "~/types/transactionType";
+import { useAuth } from "@clerk/nextjs";
 
 ChartJS.register(
   CategoryScale,
@@ -35,6 +36,8 @@ interface ChartData {
 }
 
 const BarGraph = () => {
+  const { userId, isSignedIn } = useAuth();
+  const [authChecked, setAuthChecked] = useState(false);
   const [chartData, setChartData] = useState<ChartData>({
     labels: [],
     datasets: [
@@ -48,28 +51,47 @@ const BarGraph = () => {
     ],
   });
 
+  useEffect(() => {
+    // Simulate a delay for authentication check
+    const timer = setTimeout(() => {
+      setAuthChecked(true);
+    }, 500); // Adjust the delay as needed
+    return () => clearTimeout(timer);
+  }, [isSignedIn]);
+
   const {
     data: transactions,
     isLoading,
     error,
-  } = api.transaction.getAll.useQuery();
+  } = api.transactionTable.getAll.useQuery(
+    { userId: userId as string },
+    {
+      enabled: Boolean(userId && isSignedIn),
+    },
+  );
 
   useEffect(() => {
     if (transactions && !isLoading && !error) {
+      console.log("Raw transactions data:", transactions);
+
       const categoryTotals: Record<string, number> = {};
-      transactions.forEach((transaction: Transaction) => {
-        const category =
-          typeof transaction.category === "string"
-            ? transaction.category
-            : "Uncategorized";
-        if (category) {
-          categoryTotals[category] =
-            (categoryTotals[category] ?? 0) + transaction.amount;
-        }
+
+      transactions.forEach((transaction) => {
+        const categoryName =
+          transaction.categories.categoryname || "Uncategorized";
+        const categoryId = transaction.id;
+        categoryTotals[categoryName] =
+          (categoryTotals[categoryName] ?? 0) + transaction.amountspent;
+        console.log("Category ID:", transaction.amountspent);
       });
+
+      console.log("Category Totals:", categoryTotals);
 
       const labels: string[] = Object.keys(categoryTotals);
       const dataValues: number[] = Object.values(categoryTotals);
+
+      console.log("Labels for chart:", labels);
+      console.log("Data values for chart:", dataValues);
 
       setChartData({
         labels: labels,
@@ -86,6 +108,8 @@ const BarGraph = () => {
     }
   }, [transactions, isLoading, error]);
 
+  if (!authChecked) return <p>Checking authentication...</p>;
+  if (!isSignedIn) return <p>Please log in to view the chart.</p>;
   if (isLoading) return <p>Loading chart...</p>;
   if (error) return <p>Error loading chart: {error.message}</p>;
 

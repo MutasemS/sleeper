@@ -1,8 +1,9 @@
 "use client";
 
 import { api } from "~/trpc/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loading } from "./loading";
+import { useAuth } from "@clerk/nextjs";
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -15,9 +16,25 @@ function formatDate(dateString: string): string {
 export function TransactionForm() {
   const [categoryid, setCategoryid] = useState("");
   const [amount, setAmount] = useState("");
+  const { userId, isSignedIn } = useAuth();
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAuthChecked(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [isSignedIn]);
 
   const { data: categories, isLoading: isCategoriesLoading } =
-    api.category.getAll.useQuery();
+    api.category.getAll.useQuery(
+      {
+        userid: userId as string,
+      },
+      {
+        enabled: Boolean(userId && isSignedIn),
+      },
+    );
 
   const createTransaction = api.transactionTable.create.useMutation({
     onSuccess: () => {
@@ -37,13 +54,17 @@ export function TransactionForm() {
       alert("Please enter a valid amount.");
       return;
     }
-
+    if (!userId) {
+      alert("Please log in to add a transaction.");
+      return;
+    }
     try {
       const currentDate = new Date().toISOString();
       await createTransaction.mutateAsync({
         categoryid: categoryid,
         amountspent: parsedAmount,
         transactiondate: currentDate,
+        userid: userId,
       });
     } catch (error) {
       console.error("Failed to add transaction", error);
@@ -100,6 +121,7 @@ export function TransactionForm() {
 export function CategoryForm() {
   const [categoryname, setName] = useState("");
   const [maxspendlimit, setMaxspendlimit] = useState("");
+  const { userId } = useAuth();
 
   const createCategory = api.category.create.useMutation<{
     categoryname: string;
@@ -123,10 +145,16 @@ export function CategoryForm() {
       return;
     }
 
+    if (!userId) {
+      alert("Please log in to add a category.");
+      return;
+    }
+
     try {
       await createCategory.mutateAsync({
         categoryname,
         maxspendlimit: parsedLimit,
+        userid: userId,
       });
     } catch (error) {
       console.error("Failed to add category", error);
@@ -176,9 +204,25 @@ export function CSVUploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
+  const { userId, isSignedIn } = useAuth();
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAuthChecked(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [isSignedIn]);
 
   const { data: categories, isLoading: isCategoriesLoading } =
-    api.category.getAll.useQuery();
+    api.category.getAll.useQuery(
+      {
+        userid: userId as string,
+      },
+      {
+        enabled: Boolean(userId && isSignedIn),
+      },
+    );
 
   const createTransaction = api.transactionTable.create.useMutation({
     onSuccess: () => {
@@ -241,11 +285,17 @@ export function CSVUploadForm() {
             continue;
           }
 
+          if (!userId) {
+            failedRows.push("Please log in to add transactions.");
+            continue;
+          }
+
           try {
             await createTransaction.mutateAsync({
               categoryid: String(category.categoryid),
               amountspent: amount,
               transactiondate: new Date().toISOString(),
+              userid: userId,
             });
           } catch (error) {
             failedRows.push(`Failed to process: "${row}"`);
