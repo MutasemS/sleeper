@@ -32,7 +32,7 @@ export const categoryRouter = createTRPCRouter({
         throw new Error(`Error inserting category: ${error.message}`);
       }
 
-      return data;
+      return data as Category[];
     }),
 
   getCategoryNameById: publicProcedure
@@ -86,7 +86,7 @@ export const categoryRouter = createTRPCRouter({
         throw new Error(`Error fetching categories: ${error.message}`);
       }
 
-      return data;
+      return data as Category[];
     }),
 
   delete: publicProcedure
