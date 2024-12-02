@@ -32,7 +32,7 @@ export const categoryRouter = createTRPCRouter({
         throw new Error(`Error inserting category: ${error.message}`);
       }
 
-      return data as Category[];
+      return data;
     }),
 
   getCategoryNameById: publicProcedure
