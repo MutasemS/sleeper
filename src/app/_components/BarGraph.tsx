@@ -12,7 +12,6 @@ import {
   Legend,
 } from "chart.js";
 import { api } from "~/trpc/react";
-import type { Transaction } from "~/types/transactionType";
 import { useAuth } from "@clerk/nextjs";
 
 ChartJS.register(
@@ -57,13 +56,13 @@ const BarGraph = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, [isSignedIn]);
-
+  const safeUserId = userId ?? "defaultUserId";
   const {
     data: transactions,
     isLoading,
     error,
   } = api.transactionTable.getAll.useQuery(
-    { userId: userId as string },
+    { userId: safeUserId },
     {
       enabled: Boolean(userId && isSignedIn),
     },
@@ -78,7 +77,6 @@ const BarGraph = () => {
       transactions.forEach((transaction) => {
         const categoryName =
           transaction.categories.categoryname || "Uncategorized";
-        const categoryId = transaction.id;
         categoryTotals[categoryName] =
           (categoryTotals[categoryName] ?? 0) + transaction.amountspent;
         console.log("Category ID:", transaction.amountspent);

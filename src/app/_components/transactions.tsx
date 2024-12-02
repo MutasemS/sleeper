@@ -18,7 +18,7 @@ export function TransactionForm() {
   const [amount, setAmount] = useState("");
   const { userId, isSignedIn } = useAuth();
   const [authChecked, setAuthChecked] = useState(false);
-
+  const safeUserId = userId ?? "defaultUserId";
   useEffect(() => {
     const timer = setTimeout(() => {
       setAuthChecked(true);
@@ -29,7 +29,7 @@ export function TransactionForm() {
   const { data: categories, isLoading: isCategoriesLoading } =
     api.category.getAll.useQuery(
       {
-        userid: userId as string,
+        userid: safeUserId,
       },
       {
         enabled: Boolean(userId && isSignedIn),
@@ -92,11 +92,13 @@ export function TransactionForm() {
             <option value="" disabled>
               Select a category
             </option>
-            {categories?.map((cat) => (
-              <option key={cat.categoryid} value={cat.categoryid}>
-                {cat.categoryname}
-              </option>
-            ))}
+            {categories?.map(
+              (cat: { categoryid: string; categoryname: string }) => (
+                <option key={cat.categoryid} value={cat.categoryid}>
+                  {cat.categoryname}
+                </option>
+              ),
+            )}
           </select>
         )}
         <input
@@ -206,7 +208,7 @@ export function CSVUploadForm() {
   const [fileName, setFileName] = useState<string>("");
   const { userId, isSignedIn } = useAuth();
   const [authChecked, setAuthChecked] = useState(false);
-
+  const safeUserId = userId ?? "defaultUserId";
   useEffect(() => {
     const timer = setTimeout(() => {
       setAuthChecked(true);
@@ -217,7 +219,7 @@ export function CSVUploadForm() {
   const { data: categories, isLoading: isCategoriesLoading } =
     api.category.getAll.useQuery(
       {
-        userid: userId as string,
+        userid: safeUserId,
       },
       {
         enabled: Boolean(userId && isSignedIn),

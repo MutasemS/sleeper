@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { supabase } from "~/server/supabaseClient";
-import { Category } from "~/types/categoryType";
+import type { Category } from "~/types/categoryType";
 import type { PostgrestError } from "@supabase/supabase-js";
 
 export const categoryRouter = createTRPCRouter({
@@ -13,7 +13,7 @@ export const categoryRouter = createTRPCRouter({
         userid: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input }): Promise<Category[] | null> => {
       const { data, error } = (await supabase
         .from("categories")
         .insert([
@@ -60,6 +60,7 @@ export const categoryRouter = createTRPCRouter({
 
       return data.name as string;
     }),
+
   getAll: publicProcedure
     .input(
       z.object({
@@ -68,7 +69,7 @@ export const categoryRouter = createTRPCRouter({
         userid: z.string().min(1, "User ID must be provided."),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input }): Promise<Category[] | null> => {
       const { minSpendLimit, maxSpendLimit, userid } = input;
 
       const query = supabase
@@ -87,6 +88,7 @@ export const categoryRouter = createTRPCRouter({
 
       return data;
     }),
+
   delete: publicProcedure
     .input(
       z.object({
@@ -114,7 +116,7 @@ export const categoryRouter = createTRPCRouter({
         maxspendlimit: z.number().positive().optional(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input }): Promise<Category[] | null> => {
       const { categoryid, ...updates } = input;
 
       if (Object.keys(updates).length === 0) {
