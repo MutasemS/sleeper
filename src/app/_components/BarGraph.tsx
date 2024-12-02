@@ -52,10 +52,9 @@ const BarGraph = () => {
   });
 
   useEffect(() => {
-    // Simulate a delay for authentication check
     const timer = setTimeout(() => {
       setAuthChecked(true);
-    }, 500); // Adjust the delay as needed
+    }, 500);
     return () => clearTimeout(timer);
   }, [isSignedIn]);
 
