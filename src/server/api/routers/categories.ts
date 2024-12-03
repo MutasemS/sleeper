@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { supabase } from "~/server/supabaseClient";
-import { Category } from "~/types/categoryType";
+import type { Category } from "~/types/categoryType";
 import type { PostgrestError } from "@supabase/supabase-js";
 
 export const categoryRouter = createTRPCRouter({
@@ -10,15 +10,17 @@ export const categoryRouter = createTRPCRouter({
       z.object({
         categoryname: z.string().min(1, "Category name is required"),
         maxspendlimit: z.number().positive().optional(),
+        userid: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input }): Promise<Category[] | null> => {
       const { data, error } = (await supabase
         .from("categories")
         .insert([
           {
             categoryname: input.categoryname,
             maxspendlimit: input.maxspendlimit ?? null,
+            userid: input.userid,
           },
         ])
         .select("*")) as {
@@ -58,36 +60,35 @@ export const categoryRouter = createTRPCRouter({
 
       return data.name as string;
     }),
+
   getAll: publicProcedure
     .input(
-      z
-        .object({
-          minSpendLimit: z.number().positive().optional(),
-          maxSpendLimit: z.number().positive().optional(),
-        })
-        .optional(),
+      z.object({
+        minSpendLimit: z.number().positive().optional(),
+        maxSpendLimit: z.number().positive().optional(),
+        userid: z.string().min(1, "User ID must be provided."),
+      }),
     )
-    .query(async ({ input }) => {
-      let query = supabase.from("categories").select("*");
+    .query(async ({ input }): Promise<Category[] | null> => {
+      const { minSpendLimit, maxSpendLimit, userid } = input;
 
-      if (input?.minSpendLimit) {
-        query = query.gte("maxspendlimit", input.minSpendLimit);
-      }
-      if (input?.maxSpendLimit) {
-        query = query.lte("maxspendlimit", input.maxSpendLimit);
-      }
+      const query = supabase
+        .from("categories")
+        .select("*")
+        .eq("userid", userid);
 
-      const { data, error } = (await query) as {
-        data: Category[] | null;
-        error: PostgrestError | null;
-      };
+      if (minSpendLimit) query.gte("maxspendlimit", minSpendLimit);
+      if (maxSpendLimit) query.lte("maxspendlimit", maxSpendLimit);
+
+      const { data, error } = await query;
 
       if (error) {
         throw new Error(`Error fetching categories: ${error.message}`);
       }
 
-      return data;
+      return data as Category[];
     }),
+
   delete: publicProcedure
     .input(
       z.object({
@@ -115,7 +116,7 @@ export const categoryRouter = createTRPCRouter({
         maxspendlimit: z.number().positive().optional(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input }): Promise<Category[] | null> => {
       const { categoryid, ...updates } = input;
 
       if (Object.keys(updates).length === 0) {

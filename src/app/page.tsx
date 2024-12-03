@@ -11,8 +11,14 @@ export default function Landing() {
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
             <span className="text-[hsl(280,100%,70%)]">Budget Tracker</span>
           </h1>
+
           <div className="mb-8 w-full max-w-4xl">
-            <BarGraph />
+            <SignedIn>
+              <BarGraph />
+            </SignedIn>
+            <SignedOut>
+              <p>Please sign in to view the budget tracker.</p>
+            </SignedOut>
           </div>
 
           <div className="absolute right-4 top-4">
