@@ -20,7 +20,7 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend,
+  Legend
 );
 
 interface ChartData {
@@ -33,6 +33,15 @@ interface ChartData {
     borderWidth: number;
   }[];
 }
+
+const timeRanges = [
+  { label: "1 Month", value: 30 },
+  { label: "3 Months", value: 90 },
+  { label: "6 Months", value: 180 },
+  { label: "1 Year", value: 365 },
+  { label: "5 Years", value: 1825 },
+  { label: "All Time", value: Infinity },
+];
 
 const BarGraph = () => {
   const { userId, isSignedIn } = useAuth();
@@ -49,6 +58,7 @@ const BarGraph = () => {
       },
     ],
   });
+  const [timeRange, setTimeRange] = useState("All Time");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -56,6 +66,7 @@ const BarGraph = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, [isSignedIn]);
+
   const safeUserId = userId ?? "defaultUserId";
   const {
     data: transactions,
@@ -65,30 +76,33 @@ const BarGraph = () => {
     { userId: safeUserId },
     {
       enabled: Boolean(userId && isSignedIn),
-    },
+    }
   );
 
   useEffect(() => {
     if (transactions && !isLoading && !error) {
-      console.log("Raw transactions data:", transactions);
+      const now = new Date();
+      const rangeDays =
+        timeRanges.find((range) => range.label === timeRange)?.value ||
+        Infinity;
+
+      // Filter transactions based on the selected time range
+      const filteredTransactions = transactions.filter((transaction) => {
+        const transactionDate = new Date(transaction.transactiondate);
+        return now.getTime() - transactionDate.getTime() <= rangeDays * 24 * 60 * 60 * 1000;
+      });
 
       const categoryTotals: Record<string, number> = {};
 
-      transactions.forEach((transaction) => {
+      filteredTransactions.forEach((transaction) => {
         const categoryName =
-          transaction.categories.categoryname || "Uncategorized";
+          transaction.categories?.categoryname || "Uncategorized";
         categoryTotals[categoryName] =
           (categoryTotals[categoryName] ?? 0) + transaction.amountspent;
-        console.log("Category ID:", transaction.amountspent);
       });
-
-      console.log("Category Totals:", categoryTotals);
 
       const labels: string[] = Object.keys(categoryTotals);
       const dataValues: number[] = Object.values(categoryTotals);
-
-      console.log("Labels for chart:", labels);
-      console.log("Data values for chart:", dataValues);
 
       setChartData({
         labels: labels,
@@ -103,7 +117,7 @@ const BarGraph = () => {
         ],
       });
     }
-  }, [transactions, isLoading, error]);
+  }, [transactions, isLoading, error, timeRange]);
 
   if (!authChecked) return <p>Checking authentication...</p>;
   if (!isSignedIn) return <p>Please log in to view the chart.</p>;
@@ -119,12 +133,30 @@ const BarGraph = () => {
       },
       title: {
         display: true,
-        text: "Monthly Spending by Category",
+        text: "Spending by Category",
       },
     },
   };
 
-  return <Bar data={chartData} options={options} />;
+  return (
+    <div>
+      <div style={{ marginBottom: "1rem" }}>
+        <label htmlFor="timeRange">Time Range: </label>
+        <select
+          id="timeRange"
+          value={timeRange}
+          onChange={(e) => setTimeRange(e.target.value)}
+        >
+          {timeRanges.map((range) => (
+            <option key={range.label} value={range.label}>
+              {range.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <Bar data={chartData} options={options} />
+    </div>
+  );
 };
 
 export default BarGraph;
