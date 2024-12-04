@@ -83,7 +83,7 @@ const BarGraph = () => {
     if (transactions && !isLoading && !error) {
       const now = new Date();
       const rangeDays =
-        timeRanges.find((range) => range.label === timeRange)?.value ||
+        timeRanges.find((range) => range.label === timeRange)?.value ??
         Infinity;
 
       // Filter transactions based on the selected time range
