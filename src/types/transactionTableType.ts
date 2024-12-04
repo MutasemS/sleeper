@@ -1,7 +1,11 @@
-export interface Transaction {
-  transactionid: string;
-  categoryid: string;
+interface Transaction {
+  transactionid: number;
+  categoryid: number;
   amountspent: number;
   transactiondate: string;
-  userid: string;
+  categories?: {
+    categoryid: string;
+    categoryname: string;
+    maxspendlimit?: number;
+  };
 }
