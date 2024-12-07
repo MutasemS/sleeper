@@ -7,7 +7,7 @@ import { useAuth } from "@clerk/nextjs";
 
 
 export function TransactionForm() {
-  const [categoryid, setCategoryid] = useState<number | "">(""); // categoryid is now a number or empty
+  const [categoryid, setCategoryid] = useState<number | "">("");
   const [amount, setAmount] = useState("");
   const { userId, isSignedIn } = useAuth();
   const [authChecked, setAuthChecked] = useState(false);
@@ -32,7 +32,7 @@ export function TransactionForm() {
 
   const createTransaction = api.transactionTable.create.useMutation({
     onSuccess: () => {
-      setCategoryid(""); // Reset categoryid to empty
+      setCategoryid("");
       setAmount("");
     },
     onError: (error) => {
@@ -59,7 +59,7 @@ export function TransactionForm() {
     try {
       const currentDate = new Date().toISOString();
       await createTransaction.mutateAsync({
-        categoryid: categoryid as number, // Ensure categoryid is treated as a number
+        categoryid: categoryid, 
         amountspent: parsedAmount,
         transactiondate: currentDate,
         userid: userId,
@@ -83,7 +83,7 @@ export function TransactionForm() {
         ) : (
           <select
             value={categoryid}
-            onChange={(e) => setCategoryid(e.target.value ? Number(e.target.value) : "")} // Parse to number
+            onChange={(e) => setCategoryid(e.target.value ? Number(e.target.value) : "")}
             className="rounded-full border-none bg-white/10 p-4 text-black focus:ring-2 focus:ring-[hsl(280,100%,70%)]"
             required
           >

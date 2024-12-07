@@ -15,13 +15,16 @@ function formatDate(dateString: string): string {
 export function EditTransactionForm() {
   const [amountSpent, updateAmountSpent] = useState("");
   const [transactionDate, updateTransactionDate] = useState("");
-  const [categoryId, setCategoryId] = useState<number | "">("");  // Make categoryId a number
-  const [transactionId, setTransactionId] = useState<number | "">("");  // Make transactionId a number
+  const [categoryId, setCategoryId] = useState<number | "">(""); 
+  const [transactionId, setTransactionId] = useState<number | "">("");  
   const [isModalOpen, setIsModalOpen] = useState(false); 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); 
-  const [transactionToDelete, setTransactionToDelete] = useState<number | null>(null);  // Use number for transactionToDelete
+  const [transactionToDelete, setTransactionToDelete] = useState<number | null>(null);  
   const { userId, isSignedIn } = useAuth();
   const safeUserId = userId ?? "defaultUserId";
+  const [sortField, setSortField] = useState<"categoryname" | "amountspent" | "transactiondate">("transactiondate");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+
 
   const { data: transactions, isLoading: isTransactionsLoading, refetch } = api.transactionTable.getAll.useQuery(
     {
@@ -38,14 +41,14 @@ export function EditTransactionForm() {
     amountspent?: number;
     transactiondate?: string;
   }>({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.log("Transaction updated successfully:", data);
       setTransactionId("");
       setCategoryId("");
       updateAmountSpent("");
       updateTransactionDate("");
       setIsModalOpen(false);
-      refetch();
+      await refetch();
     },
     onError: (error) => {
       console.error("Error updating transaction:", error);
@@ -53,10 +56,10 @@ export function EditTransactionForm() {
   });
 
   const deleteTransaction = api.transactionTable.delete.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       console.log("Transaction deleted successfully");
       setIsDeleteModalOpen(false);
-      refetch();
+      await refetch();
     },
     onError: (error) => {
       console.error("Error deleting transaction:", error);
@@ -108,6 +111,39 @@ export function EditTransactionForm() {
     }
   };
 
+  const handleSort = (field: "categoryname" | "amountspent" | "transactiondate") => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const sortedTransactions = [...(transactions || [])].sort((a, b) => {
+    let valueA, valueB;
+
+    switch (sortField) {
+      case "categoryname":
+        valueA = a.categories.categoryname.toLowerCase();
+        valueB = b.categories.categoryname.toLowerCase();
+        break;
+      case "amountspent":
+        valueA = a.amountspent;
+        valueB = b.amountspent;
+        break;
+      case "transactiondate":
+        valueA = new Date(a.transactiondate).getTime();
+        valueB = new Date(b.transactiondate).getTime();
+        break;
+      default:
+        return 0;
+    }
+
+    if (valueA < valueB) return sortDirection === "asc" ? -1 : 1;
+    if (valueA > valueB) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
   return (
     <div>
       {isTransactionsLoading ? (
@@ -116,14 +152,20 @@ export function EditTransactionForm() {
         <table>
           <thead>
             <tr>
-              <th>Category</th>
-              <th>Amount Spent</th>
-              <th>Transaction Date</th>
+              <th onClick={() => handleSort("categoryname")}>
+                Category {sortField === "categoryname" && (sortDirection === "asc" ? "▲" : "▼")}
+              </th>
+              <th onClick={() => handleSort("amountspent")}>
+                Amount Spent {sortField === "amountspent" && (sortDirection === "asc" ? "▲" : "▼")}
+              </th>
+              <th onClick={() => handleSort("transactiondate")}>
+                Transaction Date {sortField === "transactiondate" && (sortDirection === "asc" ? "▲" : "▼")}
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {transactions?.map((transaction) => (
+            {sortedTransactions.map((transaction) => (
               <tr key={transaction.transactionid}>
                 <td>{transaction.categories.categoryname}</td>
                 <td>{transaction.amountspent}</td>
@@ -141,9 +183,7 @@ export function EditTransactionForm() {
                   >
                     Update
                   </button>
-                  <button onClick={() => handleDelete(transaction.transactionid)}>
-                    Delete
-                  </button>
+                  <button onClick={() => handleDelete(transaction.transactionid)}>Delete</button>
                 </td>
               </tr>
             ))}

@@ -27,7 +27,7 @@ export const transactionTableRouter = createTRPCRouter({
       const { data, error } = (await supabase
         .from("transactionstable")
         .insert([{
-          categoryid,  // This is now a number
+          categoryid, 
           amountspent,
           transactiondate,
           userid,
@@ -48,7 +48,6 @@ export const transactionTableRouter = createTRPCRouter({
     .input(z.object({ userId: z.string().min(1, "User ID must be provided.") }))
     .query(async ({ input }) => {
       const { userId } = input;
-      console.log(`getAll called for userId: ${userId}`); // Debugging log
       const { data, error } = (await supabase
         .from("transactionstable")
         .select(
@@ -57,7 +56,7 @@ export const transactionTableRouter = createTRPCRouter({
         .eq("userid", userId)) as {
         data:
           | (Transaction & {
-              categories: { categoryid: number; categoryname: string }; // categoryid is a number now
+              categories: { categoryid: number; categoryname: string }; 
             })[] 
           | null;
         error: PostgrestError | null;
@@ -66,14 +65,13 @@ export const transactionTableRouter = createTRPCRouter({
       if (error) {
         throw new Error(`Error fetching transactions: ${error.message}`);
       }
-      console.log(`getAll returning data: ${JSON.stringify(data)}`); // Debugging log
       return data;
     }),
 
   getByCategory: publicProcedure
     .input(
       z.object({
-        categoryid: z.number().positive(), // categoryid should be a number now
+        categoryid: z.number().positive(),
       }),
     )
     .query(async ({ input }) => {
@@ -99,7 +97,7 @@ export const transactionTableRouter = createTRPCRouter({
   delete: publicProcedure
     .input(
       z.object({
-        transactionid: z.number().positive(), // transactionid should be a number now
+        transactionid: z.number().positive(), 
       }),
     )
     .mutation(async ({ input }) => {
@@ -123,8 +121,8 @@ export const transactionTableRouter = createTRPCRouter({
   update: publicProcedure
     .input(
       z.object({
-        transactionid: z.number().positive(), // transactionid should be a number now
-        categoryid: z.number().optional(), // categoryid is now a number
+        transactionid: z.number().positive(),
+        categoryid: z.number().optional(), 
         amountspent: z.number().positive().optional(),
         transactiondate: z
           .string()

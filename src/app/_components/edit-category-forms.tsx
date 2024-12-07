@@ -8,11 +8,13 @@ export function EditCategoryForm() {
   const [categoryname, updateName] = useState("");
   const [maxspendlimit, updateMaxspendlimit] = useState("");
   const [categoryid, setCategoryId] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);  // State to manage modal visibility
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for delete confirmation modal
-  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null); // Category to delete
+  const [isModalOpen, setIsModalOpen] = useState(false);  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); 
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null); 
   const { userId, isSignedIn } = useAuth();
   const safeUserId = userId ?? "defaultUserId";
+  const [sortField, setSortField] = useState<"categoryname" | "maxspendlimit" | null>("categoryname");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const { data: categories, isLoading: isCategoriesLoading, refetch } = api.category.getAll.useQuery(
     {
@@ -28,13 +30,13 @@ export function EditCategoryForm() {
     categoryname?: string;
     maxspendlimit?: number;
   }>({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.log("Category updated successfully:", data);
       setCategoryId("");
       updateName("");
       updateMaxspendlimit("");
       setIsModalOpen(false);
-      refetch();
+      await refetch();
     },
     onError: (error) => {
       console.error("Error updating category:", error);
@@ -42,10 +44,10 @@ export function EditCategoryForm() {
   });
 
   const deleteCategory = api.category.delete.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       console.log("Category deleted successfully");
       setIsDeleteModalOpen(false);
-      refetch();
+      await refetch();
     },
     onError: (error) => {
       console.error("Error deleting category:", error);
@@ -96,36 +98,77 @@ export function EditCategoryForm() {
     }
   };
 
+  const handleSort = (field: "categoryname" | "maxspendlimit") => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  const sortedCategories = [...(categories || [])].sort((a, b) => {
+    if (!sortField) return 0;
+    const valueA = a[sortField];
+    const valueB = b[sortField];
+
+    if (typeof valueA === "string" && typeof valueB === "string") {
+      return sortOrder === "asc"
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
+    }
+
+    if (typeof valueA === "number" && typeof valueB === "number") {
+      return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+    }
+
+    return 0;
+  });
+
   return (
     <div>
-      {isCategoriesLoading ? (
-        <p>Loading categories...</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Category Name</th>
-              <th>Max Spend Limit</th>
-              <th>Actions</th>
+    {isCategoriesLoading ? (
+      <p>Loading categories...</p>
+    ) : (
+      <table>
+        <thead>
+          <tr>
+            <th onClick={() => handleSort("categoryname")}>
+              Category Name {sortField === "categoryname" ? (sortOrder === "asc" ? "▲" : "▼") : ""}
+            </th>
+            <th onClick={() => handleSort("maxspendlimit")}>
+              Max Spend Limit {sortField === "maxspendlimit" ? (sortOrder === "asc" ? "▲" : "▼") : ""}
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedCategories.map((category) => (
+            <tr key={category.categoryid}>
+              <td>{category.categoryname}</td>
+              <td>{category.maxspendlimit}</td>
+              <td>
+                <button
+                  onClick={() =>
+                    handleCategoryUpdate(
+                      category.categoryid.toString(),
+                      category.categoryname,
+                      category.maxspendlimit.toString(),
+                    )
+                  }
+                >
+                  Update
+                </button>
+                <button
+                  onClick={() => handleDelete(category.categoryid.toString())}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {categories?.map((category) => (
-              <tr key={category.categoryid}>
-                <td>{category.categoryname}</td>
-                <td>{category.maxspendlimit}</td>
-                <td>
-                  <button onClick={() => handleCategoryUpdate(category.categoryid.toString(), category.categoryname, category.maxspendlimit.toString())}>
-                    Update
-                  </button>
-                  <button onClick={() => handleDelete(category.categoryid.toString())}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          ))}
+        </tbody>
+      </table>
       )}
 
       {isModalOpen && (
