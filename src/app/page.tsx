@@ -30,13 +30,27 @@ export default function Landing() {
             </SignedIn>
           </div>
 
-          <div className="flex w-full items-center justify-center">
+          <div className="flex w-full items-center justify-center gap-4">
             <Link
               className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
               href="/transactions"
             >
               <h3 className="text-2xl font-bold">Add Transaction →</h3>
               <div className="text-lg">Click here to add a new transaction</div>
+            </Link>
+            <Link
+              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
+              href="/categories"
+            >
+              <h3 className="text-2xl font-bold">Edit Categories →</h3>
+              <div className="text-lg">Click here to edit or update categories</div>
+            </Link>
+            <Link
+              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
+              href="/edit-transactions"
+            >
+              <h3 className="text-2xl font-bold">Edit Transactions →</h3>
+              <div className="text-lg">Click here to modify existing transactions</div>
             </Link>
           </div>
           <div className="flex flex-col items-center gap-2"></div>
