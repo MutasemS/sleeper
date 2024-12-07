@@ -1,4 +1,3 @@
-import { transactionRouter } from "~/server/api/routers/transactions";
 import { categoryRouter } from "./routers/categories";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { transactionTableRouter } from "./routers/transactionTable";
@@ -10,7 +9,6 @@ import { transactionTableRouter } from "./routers/transactionTable";
  */
 export const appRouter = createTRPCRouter({
   //post: postRouter,
-  transaction: transactionRouter,
   category: categoryRouter,
   transactionTable: transactionTableRouter,
 });

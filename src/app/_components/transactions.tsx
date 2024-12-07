@@ -5,20 +5,14 @@ import { useState, useEffect } from "react";
 import { Loading } from "./loading";
 import { useAuth } from "@clerk/nextjs";
 
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-}
 
 export function TransactionForm() {
-  const [categoryid, setCategoryid] = useState("");
+  const [categoryid, setCategoryid] = useState<number | "">("");
   const [amount, setAmount] = useState("");
   const { userId, isSignedIn } = useAuth();
   const [authChecked, setAuthChecked] = useState(false);
   const safeUserId = userId ?? "defaultUserId";
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setAuthChecked(true);
@@ -54,6 +48,10 @@ export function TransactionForm() {
       alert("Please enter a valid amount.");
       return;
     }
+    if (categoryid === "") {
+      alert("Please select a category.");
+      return;
+    }
     if (!userId) {
       alert("Please log in to add a transaction.");
       return;
@@ -61,7 +59,7 @@ export function TransactionForm() {
     try {
       const currentDate = new Date().toISOString();
       await createTransaction.mutateAsync({
-        categoryid: categoryid,
+        categoryid: categoryid, 
         amountspent: parsedAmount,
         transactiondate: currentDate,
         userid: userId,
@@ -85,20 +83,18 @@ export function TransactionForm() {
         ) : (
           <select
             value={categoryid}
-            onChange={(e) => setCategoryid(e.target.value)}
+            onChange={(e) => setCategoryid(e.target.value ? Number(e.target.value) : "")}
             className="rounded-full border-none bg-white/10 p-4 text-black focus:ring-2 focus:ring-[hsl(280,100%,70%)]"
             required
           >
             <option value="" disabled>
               Select a category
             </option>
-            {categories?.map(
-              (cat: { categoryid: string; categoryname: string }) => (
-                <option key={cat.categoryid} value={cat.categoryid}>
-                  {cat.categoryname}
-                </option>
-              ),
-            )}
+            {categories?.map((cat: { categoryid: number; categoryname: string }) => (
+              <option key={cat.categoryid} value={Number(cat.categoryid)}>
+                {cat.categoryname}
+              </option>
+            ))}
           </select>
         )}
         <input
@@ -294,7 +290,7 @@ export function CSVUploadForm() {
 
           try {
             await createTransaction.mutateAsync({
-              categoryid: String(category.categoryid),
+              categoryid: category.categoryid,
               amountspent: amount,
               transactiondate: new Date().toISOString(),
               userid: userId,

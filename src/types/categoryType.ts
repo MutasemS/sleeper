@@ -1,5 +1,5 @@
 export interface Category {
-  categoryid: string;
+  categoryid: number;
   categoryname: string;
   maxspendlimit: number;
   userid: string;
