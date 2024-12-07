@@ -60,7 +60,7 @@ export const transactionTableRouter = createTRPCRouter({
           amountspent,
           transactiondate,
           userid,
-          categories (categoryid, categoryname)
+          categories (categoryid, categoryname, maxspendlimit)
         `,
         )
         .eq("userid", userId)) as {
