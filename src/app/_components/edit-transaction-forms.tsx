@@ -120,7 +120,7 @@ export function EditTransactionForm() {
     }
   };
 
-  const sortedTransactions = [...(transactions || [])].sort((a, b) => {
+  const sortedTransactions = [...(transactions ?? [])].sort((a, b) => {
     let valueA, valueB;
 
     switch (sortField) {

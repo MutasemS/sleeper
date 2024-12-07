@@ -107,7 +107,7 @@ export function EditCategoryForm() {
     }
   };
 
-  const sortedCategories = [...(categories || [])].sort((a, b) => {
+  const sortedCategories = [...(categories ?? [])].sort((a, b) => {
     if (!sortField) return 0;
     const valueA = a[sortField];
     const valueB = b[sortField];
