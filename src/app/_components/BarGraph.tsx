@@ -90,7 +90,6 @@ const BarGraph = () => {
         return now.getTime() - transactionDate.getTime() <= rangeDays * 24 * 60 * 60 * 1000;
       });
   
-      // Add this console.log to inspect maxspendlimit values.
       filteredTransactions.forEach((transaction) => {
         console.log(
           "Category:",
