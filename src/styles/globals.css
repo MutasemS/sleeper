@@ -3,47 +3,70 @@
 @tailwind utilities;
 
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-    color: black;
-  }
-  
-  .modal-content h2 {
-    margin-bottom: 20px;
-    color: black; 
-  }
-  
-  .modal-content input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    color: black; 
-  }
-  
-  .modal-content button {
-    padding: 10px 20px;
-    margin-right: 10px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .modal-content button:hover {
-    background-color: #0056b3;
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; 
+}
+
+.modal-content {
+  background-color: #1e293b; 
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  color: #e2e8f0; 
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  color: #93c5fd; 
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #475569; 
+  border-radius: 6px;
+  background-color: #334155; 
+  color: #e2e8f0;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0px 0px 4px #93c5fd;
+}
+
+.modal-content button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 6px; 
+  background-color: #2563eb; 
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease; 
+}
+
+.modal-content button:hover {
+  background-color: #1e40af; 
+}
+
+.modal-content .cancel-button {
+  background-color: #dc2626; 
+}
+
+.modal-content .cancel-button:hover {
+  background-color: #b91c1c; 
+}
