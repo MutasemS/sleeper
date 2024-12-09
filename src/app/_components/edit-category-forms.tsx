@@ -126,77 +126,119 @@ export function EditCategoryForm() {
   });
 
   return (
-    <div>
-    {isCategoriesLoading ? (
-      <p>Loading categories...</p>
-    ) : (
-      <table>
-        <thead>
-          <tr>
-            <th onClick={() => handleSort("categoryname")}>
-              Category Name {sortField === "categoryname" ? (sortOrder === "asc" ? "▲" : "▼") : ""}
-            </th>
-            <th onClick={() => handleSort("maxspendlimit")}>
-              Max Spend Limit {sortField === "maxspendlimit" ? (sortOrder === "asc" ? "▲" : "▼") : ""}
-            </th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedCategories.map((category) => (
-            <tr key={category.categoryid}>
-              <td>{category.categoryname}</td>
-              <td>{category.maxspendlimit}</td>
-              <td>
-                <button
-                  onClick={() =>
-                    handleCategoryUpdate(
-                      category.categoryid.toString(),
-                      category.categoryname,
-                      category.maxspendlimit.toString(),
-                    )
-                  }
-                >
-                  Update
-                </button>
-                <button
-                  onClick={() => handleDelete(category.categoryid.toString())}
-                >
-                  Delete
-                </button>
-              </td>
+    <div className="rounded-lg bg-white/10 p-6 shadow-lg backdrop-blur-lg">
+      {isCategoriesLoading ? (
+        <p className="text-center text-white text-lg">Loading categories...</p>
+      ) : (
+        <table className="w-full border-separate border-spacing-y-2 text-left text-white">
+          <thead className="bg-white/10 text-hsl(280,100%,70%)">
+            <tr>
+              <th
+                className="cursor-pointer p-4"
+                onClick={() => handleSort("categoryname")}
+              >
+                Category Name{" "}
+                {sortField === "categoryname" &&
+                  (sortOrder === "asc" ? "▲" : "▼")}
+              </th>
+              <th
+                className="cursor-pointer p-4"
+                onClick={() => handleSort("maxspendlimit")}
+              >
+                Max Spend Limit{" "}
+                {sortField === "maxspendlimit" &&
+                  (sortOrder === "asc" ? "▲" : "▼")}
+              </th>
+              <th className="p-4">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sortedCategories.map((category) => (
+              <tr
+                key={category.categoryid}
+                className="rounded-lg bg-white/10 hover:bg-white/20"
+              >
+                <td className="p-4">{category.categoryname}</td>
+                <td className="p-4">{category.maxspendlimit}</td>
+                <td className="p-4 flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      handleCategoryUpdate(
+                        category.categoryid.toString(),
+                        category.categoryname,
+                        category.maxspendlimit.toString()
+                      )
+                    }
+                    className="rounded-full bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                  >
+                    Update
+                  </button>
+                  <button
+                    onClick={() => handleDelete(category.categoryid.toString())}
+                    className="rounded-full bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
 
       {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Update Category</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="rounded-lg bg-white/20 p-6 shadow-lg backdrop-blur-lg w-full max-w-lg">
+            <h2 className="mb-4 text-center text-xl font-bold text-[hsl(280,100%,70%)]">
+              Update Category
+            </h2>
             <form onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="categoryname">Category Name</label>
-                <input
-                  id="categoryname"
-                  type="text"
-                  value={categoryname}
-                  onChange={(e) => updateName(e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="maxspendlimit">Max Spend Limit</label>
-                <input
-                  id="maxspendlimit"
-                  type="number"
-                  value={maxspendlimit}
-                  onChange={(e) => updateMaxspendlimit(e.target.value)}
-                />
-              </div>
-              <div>
-                <button type="submit">Update</button>
-                <button type="button" onClick={() => setIsModalOpen(false)}>Cancel</button>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label
+                    htmlFor="categoryname"
+                    className="block mb-2 text-white text-sm"
+                  >
+                    Category Name
+                  </label>
+                  <input
+                    id="categoryname"
+                    type="text"
+                    value={categoryname}
+                    onChange={(e) => updateName(e.target.value)}
+                    className="rounded-full border-none bg-white/10 p-4 text-white placeholder-gray-300 focus:ring-2 focus:ring-[hsl(280,100%,70%)] w-full"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="maxspendlimit"
+                    className="block mb-2 text-white text-sm"
+                  >
+                    Max Spend Limit
+                  </label>
+                  <input
+                    id="maxspendlimit"
+                    type="number"
+                    value={maxspendlimit}
+                    onChange={(e) => updateMaxspendlimit(e.target.value)}
+                    className="rounded-full border-none bg-white/10 p-4 text-white placeholder-gray-300 focus:ring-2 focus:ring-[hsl(280,100%,70%)] w-full"
+                  />
+                </div>
+                <div className="flex justify-end gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="rounded-full bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="rounded-full bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                  >
+                    Update
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -204,12 +246,27 @@ export function EditCategoryForm() {
       )}
 
       {isDeleteModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Are you sure you want to delete this category?</h2>
-            <div>
-              <button onClick={confirmDelete}>Yes, Delete</button>
-              <button onClick={() => setIsDeleteModalOpen(false)}>Cancel</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="rounded-lg bg-white/20 p-6 shadow-lg backdrop-blur-lg w-full max-w-sm">
+            <h2 className="mb-4 text-center text-xl font-bold text-[hsl(280,100%,70%)]">
+              Confirm Delete
+            </h2>
+            <p className="mb-6 text-center text-white text-sm">
+              Are you sure you want to delete this category? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="rounded-full bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="rounded-full bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

@@ -145,32 +145,52 @@ export function EditTransactionForm() {
     return 0;
   });
   return (
-    <div>
+    <div className="rounded-lg bg-white/10 p-6 shadow-lg backdrop-blur-lg">
       {isTransactionsLoading ? (
-        <p>Loading transactions...</p>
+        <p className="text-center text-white text-lg">Loading transactions...</p>
       ) : (
-        <table>
-          <thead>
+        <table className="w-full border-separate border-spacing-y-2 text-left text-white">
+          <thead className="bg-white/10 text-hsl(280,100%,70%)">
             <tr>
-              <th onClick={() => handleSort("categoryname")}>
-                Category {sortField === "categoryname" && (sortDirection === "asc" ? "▲" : "▼")}
+              <th
+                className="cursor-pointer p-4"
+                onClick={() => handleSort("categoryname")}
+              >
+                Category{" "}
+                {sortField === "categoryname" &&
+                  (sortDirection === "asc" ? "▲" : "▼")}
               </th>
-              <th onClick={() => handleSort("amountspent")}>
-                Amount Spent {sortField === "amountspent" && (sortDirection === "asc" ? "▲" : "▼")}
+              <th
+                className="cursor-pointer p-4"
+                onClick={() => handleSort("amountspent")}
+              >
+                Amount Spent{" "}
+                {sortField === "amountspent" &&
+                  (sortDirection === "asc" ? "▲" : "▼")}
               </th>
-              <th onClick={() => handleSort("transactiondate")}>
-                Transaction Date {sortField === "transactiondate" && (sortDirection === "asc" ? "▲" : "▼")}
+              <th
+                className="cursor-pointer p-4"
+                onClick={() => handleSort("transactiondate")}
+              >
+                Transaction Date{" "}
+                {sortField === "transactiondate" &&
+                  (sortDirection === "asc" ? "▲" : "▼")}
               </th>
-              <th>Actions</th>
+              <th className="p-4">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sortedTransactions.map((transaction) => (
-              <tr key={transaction.transactionid}>
-                <td>{transaction.categories.categoryname}</td>
-                <td>{transaction.amountspent}</td>
-                <td>{formatDate(transaction.transactiondate)}</td>
-                <td>
+              <tr
+                key={transaction.transactionid}
+                className="rounded-lg bg-white/10 hover:bg-white/20"
+              >
+                <td className="p-4">{transaction.categories.categoryname}</td>
+                <td className="p-4">{transaction.amountspent}</td>
+                <td className="p-4">
+                  {formatDate(transaction.transactiondate)}
+                </td>
+                <td className="p-4 flex items-center gap-2">
                   <button
                     onClick={() =>
                       handleTransactionUpdate(
@@ -180,10 +200,16 @@ export function EditTransactionForm() {
                         transaction.transactiondate
                       )
                     }
+                    className="rounded-full bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                   >
                     Update
                   </button>
-                  <button onClick={() => handleDelete(transaction.transactionid)}>Delete</button>
+                  <button
+                    onClick={() => handleDelete(transaction.transactionid)}
+                    className="rounded-full bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -192,44 +218,88 @@ export function EditTransactionForm() {
       )}
 
       {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Update Transaction</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="rounded-lg bg-white/20 p-6 shadow-lg backdrop-blur-lg w-full max-w-lg">
+            <h2 className="mb-4 text-center text-xl font-bold text-[hsl(280,100%,70%)]">
+              Update Transaction
+            </h2>
             <form onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="amountspent">Amount Spent</label>
-                <input
-                  id="amountspent"
-                  type="number"
-                  value={amountSpent}
-                  onChange={(e) => updateAmountSpent(e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="transactiondate">Transaction Date</label>
-                <input
-                  id="transactiondate"
-                  type="date"
-                  value={transactionDate}
-                  onChange={(e) => updateTransactionDate(e.target.value)}
-                />
-              </div>
-              <div>
-                <button type="submit">Update</button>
-                <button type="button" onClick={() => setIsModalOpen(false)}>Cancel</button>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label
+                    htmlFor="amountspent"
+                    className="block mb-2 text-white text-sm"
+                  >
+                    Amount Spent
+                  </label>
+                  <input
+                    id="amountspent"
+                    type="number"
+                    value={amountSpent}
+                    onChange={(e) => updateAmountSpent(e.target.value)}
+                    className="rounded-full border-none bg-white/10 p-4 text-white placeholder-gray-300 focus:ring-2 focus:ring-[hsl(280,100%,70%)] w-full"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="transactiondate"
+                    className="block mb-2 text-white text-sm"
+                  >
+                    Transaction Date
+                  </label>
+                  <input
+                    id="transactiondate"
+                    type="date"
+                    value={transactionDate}
+                    onChange={(e) => updateTransactionDate(e.target.value)}
+                    className="rounded-full border-none bg-white/10 p-4 text-white focus:ring-2 focus:ring-[hsl(280,100%,70%)] w-full"
+                  />
+                </div>
+                <div className="flex justify-end gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="rounded-full bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="rounded-full bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                  >
+                    Update
+                  </button>
+                </div>
               </div>
             </form>
           </div>
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Are you sure you want to delete this transaction?</h2>
-            <div>
-              <button onClick={confirmDelete}>Yes, Delete</button>
-              <button onClick={() => setIsDeleteModalOpen(false)}>Cancel</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="rounded-lg bg-white/20 p-6 shadow-lg backdrop-blur-lg w-full max-w-sm">
+            <h2 className="mb-4 text-center text-xl font-bold text-[hsl(280,100%,70%)]">
+              Confirm Delete
+            </h2>
+            <p className="mb-6 text-center text-white text-sm">
+              Are you sure you want to delete this transaction? This action cannot
+              be undone.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="rounded-full bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="rounded-full bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
