@@ -8,4 +8,5 @@ export interface Transaction {
     categoryname: string;
     maxspendlimit?: number;
   };
+  userid: string;
 }
