@@ -51,7 +51,14 @@ export const transactionTableRouter = createTRPCRouter({
       const { data, error } = (await supabase
         .from("transactionstable")
         .select(
-          `transactionid, categoryid, amountspent, transactiondate, userid, categories (categoryid, categoryname)`
+          `
+          transactionid,
+          categoryid,
+          amountspent,
+          transactiondate,
+          userid,
+          categories (categoryid, categoryname, maxspendlimit)
+        `,
         )
         .eq("userid", userId)) as {
         data:

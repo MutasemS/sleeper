@@ -20,7 +20,7 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend,
+  Legend
 );
 
 interface ChartData {
@@ -28,11 +28,20 @@ interface ChartData {
   datasets: {
     label: string;
     data: number[];
-    backgroundColor: string;
-    borderColor: string;
+    backgroundColor: string[];
+    borderColor: string[];
     borderWidth: number;
   }[];
 }
+
+const timeRanges = [
+  { label: "1 Month", value: 30 },
+  { label: "3 Months", value: 90 },
+  { label: "6 Months", value: 180 },
+  { label: "1 Year", value: 365 },
+  { label: "5 Years", value: 1825 },
+  { label: "All Time", value: Infinity },
+];
 
 const BarGraph = () => {
   const { userId, isSignedIn } = useAuth();
@@ -43,12 +52,13 @@ const BarGraph = () => {
       {
         label: "Spending ($)",
         data: [],
-        backgroundColor: "rgba(75, 192, 192, 0.6)",
-        borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: [],
+        borderColor: [],
         borderWidth: 1,
       },
     ],
   });
+  const [timeRange, setTimeRange] = useState("All Time");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -56,6 +66,7 @@ const BarGraph = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, [isSignedIn]);
+
   const safeUserId = userId ?? "defaultUserId";
   const {
     data: transactions,
@@ -65,45 +76,65 @@ const BarGraph = () => {
     { userId: safeUserId },
     {
       enabled: Boolean(userId && isSignedIn),
-    },
+    }
   );
 
   useEffect(() => {
     if (transactions && !isLoading && !error) {
-      console.log("Raw transactions data:", transactions);
-
-      const categoryTotals: Record<string, number> = {};
-
-      transactions.forEach((transaction) => {
-        const categoryName =
-          transaction.categories.categoryname || "Uncategorized";
-        categoryTotals[categoryName] =
-          (categoryTotals[categoryName] ?? 0) + transaction.amountspent;
-        console.log("Category ID:", transaction.amountspent);
+      const now = new Date();
+      const rangeDays =
+        timeRanges.find((range) => range.label === timeRange)?.value ?? Infinity;
+  
+      const filteredTransactions = transactions.filter((transaction) => {
+        const transactionDate = new Date(transaction.transactiondate);
+        return now.getTime() - transactionDate.getTime() <= rangeDays * 24 * 60 * 60 * 1000;
       });
-
-      console.log("Category Totals:", categoryTotals);
-
-      const labels: string[] = Object.keys(categoryTotals);
-      const dataValues: number[] = Object.values(categoryTotals);
-
-      console.log("Labels for chart:", labels);
-      console.log("Data values for chart:", dataValues);
-
+  
+      filteredTransactions.forEach((transaction) => {
+        console.log(
+          "Category:",
+          transaction.categories?.categoryname,
+          "Max Spend Limit:",
+          transaction.categories?.maxspendlimit
+        );
+      });
+  
+      const categoryTotals: Record<string, { totalSpent: number; maxLimit: number }> = {};
+  
+      filteredTransactions.forEach((transaction) => {
+        const categoryName = transaction.categories?.categoryname ?? "Uncategorized";
+        const maxLimit = transaction.categories?.maxspendlimit ?? Infinity;
+  
+        if (!categoryTotals[categoryName]) {
+          categoryTotals[categoryName] = { totalSpent: 0, maxLimit };
+        }
+  
+        categoryTotals[categoryName].totalSpent += transaction.amountspent;
+      });
+  
+      const labels = Object.keys(categoryTotals);
+      const dataValues = labels.map((label) => categoryTotals[label]!.totalSpent);
+      const barColors = labels.map((label) =>
+        categoryTotals[label]!.totalSpent > categoryTotals[label]!.maxLimit
+          ? "rgba(255, 99, 132, 0.6)"
+          : "rgba(75, 192, 192, 0.6)"
+      );
+  
       setChartData({
-        labels: labels,
+        labels,
         datasets: [
           {
             label: "Spending ($)",
             data: dataValues,
-            backgroundColor: "rgba(75, 192, 192, 0.6)",
-            borderColor: "rgba(75, 192, 192, 1)",
+            backgroundColor: barColors,
+            borderColor: barColors,
             borderWidth: 1,
           },
         ],
       });
     }
-  }, [transactions, isLoading, error]);
+  }, [transactions, isLoading, error, timeRange]);
+  
 
   if (!authChecked) return <p>Checking authentication...</p>;
   if (!isSignedIn) return <p>Please log in to view the chart.</p>;
@@ -119,12 +150,42 @@ const BarGraph = () => {
       },
       title: {
         display: true,
-        text: "Monthly Spending by Category",
+        text: "Spending by Category",
       },
     },
   };
 
-  return <Bar data={chartData} options={options} />;
+  return (
+    <div>
+      <div style={{ marginBottom: "1rem" }}>
+        <label htmlFor="timeRange">Time Range: </label>
+        <select
+          id="timeRange"
+          value={timeRange}
+          onChange={(e) => setTimeRange(e.target.value)}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            padding: "0.5rem",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        >
+          {timeRanges.map((range) => (
+            <option
+              key={range.label}
+              value={range.label}
+              style={{ color: "black" }}
+            >
+              {range.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <Bar data={chartData} options={options} />
+    </div>
+  );
 };
 
 export default BarGraph;

@@ -3,5 +3,9 @@ export interface Transaction {
   categoryid: number;
   amountspent: number;
   transactiondate: string;
-  userid: string;
+  categories?: {
+    categoryid: string;
+    categoryname: string;
+    maxspendlimit?: number;
+  };
 }
